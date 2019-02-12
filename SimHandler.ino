@@ -1,7 +1,13 @@
+#include <timer-api.h>
+#include <LiquidCrystal_I2C.h>
 #include <SoftwareSerial.h>
 
 // Configure software serial port
 SoftwareSerial SIM900(7, 8);
+
+void timer_handle_interrupts(int timer)
+{
+}
 
 void setup()
 {
@@ -72,3 +78,4 @@ void handleSimMessage(String input)
                 }
     }
 }
+
