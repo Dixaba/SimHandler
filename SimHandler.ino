@@ -4,7 +4,7 @@
 
 #define btn 4
 #define BLT 3
-#define LT 2;
+#define LT 3;
 
 SoftwareSerial SIM900(7, 8);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -13,7 +13,6 @@ volatile bool btnPressed = false;
 volatile bool off = true;
 volatile bool waitLight = false;
 volatile bool needUpdate = false;
-bool showSignal = true;
 bool showStat = true;
 byte state = 0;
 byte lightTime = 0;
@@ -70,11 +69,9 @@ void setup()
 {
   timer_init_ISR_1KHz(TIMER_DEFAULT);
   lcd.init();
-  delay(3000);
   Serial.begin(9600);
   SIM900.begin(9600);
   Serial.println("Started");
-  SIM900.print(F("AT*PSSTK=\"SETUP MENU\",1,1\r"));
 }
 
 String input = "";
@@ -105,7 +102,7 @@ void loop()
       lcd.backlight();
       operation = CHISTKA;
       showStat = false;
-      state++;
+      state = 1;
       btnPressed = false;
     }
 
@@ -130,14 +127,9 @@ void loop()
 
       if (showStat)
         {
-          showSignal = !showSignal;
-
-          if (showSignal)
-            {
-              lcd.clear();
-              lcd.print(F("Rabotaem..."));
-              SIM900.print(F("AT+CSQ\r"));
-            }
+          lcd.clear();
+          lcd.print(F("Rabotaem..."));
+          SIM900.print(F("AT+CSQ\r"));
         }
     }
 
@@ -260,7 +252,7 @@ void parseMessage(String &input)
       return;
     }
 
-  if (input.indexOf(F("044304340430043B0435043D")) > 0)
+  if (input.indexOf(F("0020044304340430043B0435043D")) > 0)
     {
       //udalily kluch
       operation = SUCCESS;
