@@ -4,7 +4,7 @@
 
 #define btn 4
 #define BLT 3
-#define LT 3;
+#define LT 3
 
 SoftwareSerial SIM900(7, 8);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -14,6 +14,7 @@ volatile bool off = true;
 volatile bool waitLight = false;
 volatile bool needUpdate = false;
 bool showStat = true;
+bool emph = true;
 byte state = 0;
 byte lightTime = 0;
 
@@ -98,10 +99,10 @@ void loop()
 
   if (btnPressed)
     {
+      showStat = false;
       lcd.clear();
       lcd.backlight();
       operation = CHISTKA;
-      showStat = false;
       state = 1;
       btnPressed = false;
     }
@@ -127,8 +128,13 @@ void loop()
 
       if (showStat)
         {
+          emph = !emph;
           lcd.clear();
-          lcd.print(F("Rabotaem..."));
+          lcd.print(F("Rabotaem"));
+
+          if (emph)
+            { lcd.print(F("...")); }
+
           SIM900.print(F("AT+CSQ\r"));
         }
     }
@@ -219,8 +225,8 @@ void loop()
         break;
       }
 
-      case 100:
-      case 101:
+      case 50:
+      case 51:
       {
         SIM900.print(F("AT*PSSTK=\"COMMAND REJECTED\",1,16\r"));
         state = 0;
@@ -252,7 +258,7 @@ void parseMessage(String &input)
       return;
     }
 
-  if (input.indexOf(F("0020044304340430043B0435043D")) > 0)
+  if (input.indexOf(F("800B041A043B044E04470020044304340430043B0435043D")) > 0)
     {
       //udalily kluch
       operation = SUCCESS;
@@ -263,7 +269,7 @@ void parseMessage(String &input)
     {
       // net kluchey
       operation = UNKNOWN;
-      state = 98;
+      state = 48;
       return;
     }
 }
@@ -380,7 +386,18 @@ void handleSimMessage(String &input)
           lcd.print(F("End session"));
           Serial.println(F("end"));
           lcd.setCursor(0, 1);
-          state = 100;
+          state = 50;
+          waitLight = true;
+          return;
+        }
+        
+      if (input.indexOf(F("SELECT ITEM")) > 0 && state > 15)
+        {
+          lcd.clear();
+          lcd.print(F("End session"));
+          Serial.println(F("end"));
+          lcd.setCursor(0, 1);
+          state = 50;
           waitLight = true;
           return;
         }
@@ -392,6 +409,7 @@ void handleSimMessage(String &input)
       lcd.print(F("Signal: "));
       input.replace("\r", "");
       lcd.print(input.substring(6));
+      showStat = true;
     }
 }
 
