@@ -337,6 +337,7 @@ void handleSimMessage(String &input)
         {
           lcd.clear();
           lcd.print(F("Play tone"));
+          lcd.print(showStat ? 1 : 0);
           Serial.println(F("play tone"));
           SIM900.print(F("AT*PSSTK=\"PLAY TONE\",1,0\r"));
           return;
@@ -390,7 +391,7 @@ void handleSimMessage(String &input)
           waitLight = true;
           return;
         }
-        
+
       if (input.indexOf(F("SELECT ITEM")) > 0 && state > 15)
         {
           lcd.clear();
@@ -409,7 +410,8 @@ void handleSimMessage(String &input)
       lcd.print(F("Signal: "));
       input.replace("\r", "");
       lcd.print(input.substring(6));
-      showStat = true;
+      return;
     }
 }
+
 
