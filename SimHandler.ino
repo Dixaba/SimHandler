@@ -5,6 +5,7 @@
 #define btn 4
 #define BLT 3
 #define LT 3
+#define DELAY 3000
 
 SoftwareSerial SIM900(7, 8);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -29,12 +30,12 @@ void timer_handle_interrupts(int timer)
   static int currBtnState = HIGH;
   int btnState = digitalRead(btn);
   static int btnCount = 0;
-  static int count = 3000;
+  static int count = DELAY;
 
   if (count == 0)
     {
       needUpdate = true;
-      count = 3000;
+      count = DELAY;
     }
   else
     {
@@ -331,13 +332,13 @@ void handleSimMessage(String &input)
   if (input.startsWith("*"))
     {
       showStat = false;
+      delay(500);
       lcd.backlight();
 
       if (input.indexOf(F("PLAY TONE")) > 0)
         {
           lcd.clear();
           lcd.print(F("Play tone"));
-          lcd.print(showStat ? 1 : 0);
           Serial.println(F("play tone"));
           SIM900.print(F("AT*PSSTK=\"PLAY TONE\",1,0\r"));
           return;
