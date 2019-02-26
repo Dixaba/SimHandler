@@ -71,8 +71,8 @@ void setup()
 {
   timer_init_ISR_1KHz(TIMER_DEFAULT);
   lcd.init();
-  Serial.begin(9600);
-  SIM900.begin(9600);
+  Serial.begin(19200);
+  SIM900.begin(19200);
   Serial.println("Started");
 }
 
@@ -332,11 +332,11 @@ void handleSimMessage(String &input)
   if (input.startsWith("*"))
     {
       showStat = false;
-      delay(500);
       lcd.backlight();
 
       if (input.indexOf(F("PLAY TONE")) > 0)
         {
+          delay(500);
           lcd.clear();
           lcd.print(F("Play tone"));
           Serial.println(F("play tone"));
